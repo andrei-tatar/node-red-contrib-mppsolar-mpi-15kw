@@ -39,7 +39,6 @@ export class SerialCommunication {
             return () => {
                 logger?.trace('observable closed');
                 wrapper.end();
-                port.end();
             };
         })
     }
@@ -59,6 +58,7 @@ export class SerialCommunication {
     end() {
         this.logger?.trace('end');
         this._data.complete();
+        this.port.close();
         this.port.end();
     }
 }
