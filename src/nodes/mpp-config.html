@@ -1,0 +1,33 @@
+<script type="text/javascript">
+  (function () {
+    RED.nodes.registerType("mpp-config", {
+      category: "config",
+      defaults: {
+        name: {
+          value: "mpp config",
+        },
+        path: {
+          value: "COM1",
+          required: true,
+        },
+      },
+      paletteLabel: "mpp config",
+      label: function () {
+        return this.name || "mpp config";
+      },
+    });
+  })();
+</script>
+
+<script type="text/x-red" data-template-name="mpp-config">
+  <div class="form-row">
+      <label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
+      <input type="text" id="node-config-input-name">
+  </div>
+  <div class="form-row">
+      <label for="node-config-input-path"><i class="fa fa-thumb-tack"></i> Path</label>
+      <input type="text" id="node-config-input-path">
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="noraf-config"></script>

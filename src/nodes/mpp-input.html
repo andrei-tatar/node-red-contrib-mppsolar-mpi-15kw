@@ -1,0 +1,110 @@
+<script type="text/javascript">
+  (function () {
+    const AVAILABLE_QUERIES = [
+      "ProtocolId",
+      "SeriesNumber",
+      "CpuVersion",
+      "2ndCpuVersion",
+      "DeviceModel",
+      "RatedInformation",
+      "GeneralStatus",
+      "PowerStatus",
+      "WorkingMode",
+      "WarningStatus",
+      "Flags",
+    ];
+    RED.nodes.registerType("mpp-input", {
+      category: "mpp",
+      color: "rgb(252, 255, 235)",
+      icon: "leaf.png",
+      defaults: {
+        name: {
+          value: "",
+        },
+        mpp: {
+          type: "mpp-config",
+          required: true,
+        },
+        interval: {
+          value: "30",
+          validate: RED.validators.number(),
+        },
+        timeout: {
+          value: "3",
+          validate: RED.validators.number(),
+          required: true,
+        },
+        query: {
+          value: "",
+        },
+      },
+      inputs: 0,
+      outputs: 1,
+      paletteLabel: "mpp input",
+      label: function () {
+        return this.name || "mpp input";
+      },
+      oneditprepare: function () {
+        var row;
+        var queries = (this.query && this.query.split(",")) || [];
+        AVAILABLE_QUERIES.forEach(function (query, index) {
+          const label = query.replace(/[A-Z]/gm, (v) => " " + v).trim();
+          const checked = queries.indexOf(query) >= 0 ? "checked " : "";
+          const id = `query-${query}`;
+          $("#query-container").append(
+            `<div class="query-item"><input type="checkbox" ${checked} data-query="${query}" id="${id}"><label for="${id}">${label}</label></div>`
+          );
+        });
+      },
+      oneditsave: function () {
+        var queries = [];
+        $(".query-item input:checked").each(function () {
+          queries.push($(this).attr("data-query"));
+        });
+        this.query = queries.join(",");
+      },
+    });
+  })();
+</script>
+
+<script type="text/x-red" data-template-name="mpp-input">
+  <style>
+      #query-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+      .query-item {
+        display: flex;
+        align-items: center;
+      }
+      .query-item label {
+        width: unset !important;
+        margin: 0 !important;
+      }
+      .query-item input {
+        margin: 10px 5px !important;
+        width: unset !important;
+      }
+  </style>
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-mpp"><i class="fa fa-table"></i> Config</label>
+    <input type="text" id="node-input-mpp">
+  </div>
+  <div class="form-row">
+    <label for="node-input-interval"><i class="fa fa-clock-o"></i> Interval sec</label>
+    <input type="text" id="node-input-interval">
+  </div>
+  <div class="form-row">
+    <label for="node-input-timeout"><i class="fa fa-times-circle-o"></i> Timeout sec</label>
+    <input type="text" id="node-input-timeout">
+  </div>
+  <div class="form-row d-flex flex-column">
+    <div id="query-container"></div>
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="mpp-input"></script>

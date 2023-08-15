@@ -1,0 +1,40 @@
+{
+  "name": "@andrei-tatar/node-red-contrib-mppsolar-mpi-15kw",
+  "version": "1.0.0",
+  "description": "MPP Solar Inverter MPI 15KW WP integration for node-red",
+  "keywords": [
+    "node-red",
+    "mpp-solar",
+    "mpi-15kw"
+  ],
+  "main": "dist/index.js",
+  "scripts": {
+    "clean": "rm -rf build",
+    "build": "tsc && cp src/nodes/*.html dist/nodes/ && cp -r src/nodes/icons dist/nodes/icons",
+    "pub": "npm run clean && npm run build && npm publish --registry https://registry.npmjs.org/ --access=public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andrei-tatar/node-red-contrib-mppsolar-mpi-15kw.git"
+  },
+  "engines": {
+    "node": ">=12.19"
+  },
+  "author": "Andrei Tatar",
+  "license": "ISC",
+  "devDependencies": {
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "rxjs": "^7.8.0",
+    "serialport": "^11.0.1"
+  },
+  "node-red": {
+    "version": ">=1.0.0",
+    "nodes": {
+      "mpp-config": "dist/nodes/mpp-config.js",
+      "mpp-input": "dist/nodes/mpp-input.js"
+    }
+  }
+}
