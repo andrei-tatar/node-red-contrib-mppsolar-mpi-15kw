@@ -9,7 +9,7 @@
   ],
   "main": "dist/index.js",
   "scripts": {
-    "clean": "rm -rf build",
+    "clean": "rm -rf dist",
     "build": "tsc && cp src/nodes/*.html dist/nodes/ && cp -r src/nodes/icons dist/nodes/icons",
     "pub": "npm run clean && npm run build && npm publish --registry https://registry.npmjs.org/ --access=public"
   },
