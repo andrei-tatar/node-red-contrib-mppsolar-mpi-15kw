@@ -36,5 +36,4 @@ export interface NodeInterface {
 
 export interface ConfigNode {
     mpp$: Observable<Mpp>;
-    reset(): void;
 }

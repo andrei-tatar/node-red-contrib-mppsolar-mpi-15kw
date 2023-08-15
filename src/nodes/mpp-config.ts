@@ -36,12 +36,7 @@ module.exports = function (RED: any) {
             ).pipe(
                 share({
                     connector: () => new ReplaySubject(1),
-                    resetOnComplete: true,
-                    resetOnError: true,
-                    resetOnRefCountZero: () => timer(5000),
                 }),
             );
-
-            this.reset = () => reset$.next();
         });
 };

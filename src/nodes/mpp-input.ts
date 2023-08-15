@@ -35,14 +35,6 @@ module.exports = function (RED: any) {
             let timeoutMsec = (+config.timeout || 3) * 1000;
             const intervalMsec = (+config.interval || 10) * 1000;
             const close$ = new Subject<void>();
-            let consecutiveErrors = 0;
-
-            const resetConnectionOnConsecutiveErrors = () => {
-                if (++consecutiveErrors >= 3) {
-                    log?.trace('3 consecutive errors, reseting config');
-                    mppConfig.reset();
-                };
-            };
 
             concat(
                 defer(() => {
@@ -74,11 +66,9 @@ module.exports = function (RED: any) {
                 tap(v => {
                     log?.trace('got response', { value: v });
                     this.status({});
-                    consecutiveErrors = 0;
                 }),
                 catchError((err) => {
                     this.status({ fill: 'red', text: `${err}` })
-                    resetConnectionOnConsecutiveErrors();
                     return throwError(() => err);
                 }),
                 finalize(() => {
@@ -86,8 +76,9 @@ module.exports = function (RED: any) {
                     this.status({ fill: 'red', text: 'disconnected' });
                 }),
                 retry({
-                    delay: () => {
-                        const delay = Math.min(30000, 500 * Math.pow(2, consecutiveErrors));
+                    resetOnSuccess: true,
+                    delay: (_, retryCount) => {
+                        const delay = Math.min(30000, 500 * Math.pow(2, retryCount));
                         return timer(delay);
                     },
                 }),
