@@ -1,4 +1,4 @@
-import { merge, ReplaySubject, Subject, throwError } from 'rxjs';
+import { merge, ReplaySubject, Subject, throwError, timer } from 'rxjs';
 import { debounceTime, first, ignoreElements, share, switchMap } from 'rxjs/operators';
 import { ConfigNode, NodeInterface } from '..';
 import { Mpp } from '../communication/mpp';
@@ -34,7 +34,12 @@ module.exports = function (RED: any) {
                     ignoreElements(),
                 ),
             ).pipe(
-                share({ connector: () => new ReplaySubject(1) }),
+                share({
+                    connector: () => new ReplaySubject(1),
+                    resetOnComplete: true,
+                    resetOnError: true,
+                    resetOnRefCountZero: () => timer(5000),
+                }),
             );
 
             this.reset = () => reset$.next();

@@ -1,4 +1,4 @@
-import { combineLatest, concat, defer, interval, EMPTY, Subject, merge, Observable, throwError } from 'rxjs';
+import { combineLatest, concat, defer, interval, EMPTY, Subject, merge, Observable, throwError, timer } from 'rxjs';
 import { finalize, catchError, startWith, tap, retry, takeUntil, concatMap, map } from 'rxjs/operators';
 import { ConfigNode, NodeInterface } from '..';
 import { logger } from '../log';
@@ -46,7 +46,6 @@ module.exports = function (RED: any) {
 
             concat(
                 defer(() => {
-                    consecutiveErrors = 0;
                     log?.trace('starting subscription');
                     this.status({ fill: 'yellow', text: 'standby' })
                     return EMPTY;
@@ -78,7 +77,6 @@ module.exports = function (RED: any) {
                     consecutiveErrors = 0;
                 }),
                 catchError((err) => {
-                    this.warn(`error ${err}`);
                     this.status({ fill: 'red', text: `${err}` })
                     resetConnectionOnConsecutiveErrors();
                     return throwError(() => err);
@@ -87,7 +85,12 @@ module.exports = function (RED: any) {
                     log?.trace('disconnected');
                     this.status({ fill: 'red', text: 'disconnected' });
                 }),
-                retry({ delay: 5000 }),
+                retry({
+                    delay: () => {
+                        const delay = Math.min(30000, 500 * Math.pow(2, consecutiveErrors));
+                        return timer(delay);
+                    },
+                }),
                 takeUntil(close$),
             ).subscribe({
                 next: (msg) => this.send(msg),
