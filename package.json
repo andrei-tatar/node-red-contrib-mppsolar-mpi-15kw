@@ -1,6 +1,6 @@
 {
   "name": "@andrei-tatar/node-red-contrib-mppsolar-mpi-15kw",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "MPP Solar Inverter MPI 15KW WP integration for node-red",
   "keywords": [
     "node-red",
