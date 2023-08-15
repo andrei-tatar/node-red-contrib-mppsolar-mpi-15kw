@@ -1,5 +1,5 @@
-import { merge, ReplaySubject, Subject, throwError, timer } from 'rxjs';
-import { debounceTime, first, ignoreElements, share, switchMap } from 'rxjs/operators';
+import { merge, ReplaySubject, Subject, throwError } from 'rxjs';
+import { debounceTime, first, ignoreElements, share, switchMap, tap } from 'rxjs/operators';
 import { ConfigNode, NodeInterface } from '..';
 import { Mpp } from '../communication/mpp';
 import { logger } from '../log';
@@ -34,6 +34,9 @@ module.exports = function (RED: any) {
                     ignoreElements(),
                 ),
             ).pipe(
+                tap({
+                    error: (err) => this.warn(`Error: ${err}`),
+                }),
                 share({
                     connector: () => new ReplaySubject(1),
                 }),

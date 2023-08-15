@@ -78,7 +78,7 @@ module.exports = function (RED: any) {
                 retry({
                     resetOnSuccess: true,
                     delay: (_, retryCount) => {
-                        const delay = Math.min(30000, 500 * Math.pow(2, retryCount));
+                        const delay = Math.min(10000, 500 * Math.pow(1.4, retryCount));
                         return timer(delay);
                     },
                 }),
