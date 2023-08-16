@@ -55,17 +55,17 @@ export class Mpp {
     queryDeviceModel(timeout?: number) {
         return this.comm.query('MD', timeout ?? this.timeout).pipe(
             map(v => {
-                const parts = v.split(',');
+                const parts = v.split(',').map(p => +p);
                 return {
-                    machineNumber: +parts[0],
-                    ratedVa: +parts[1],
-                    outputPowerFactor: (+parts[2]) / 100,
-                    inputPhaseNumber: +parts[3],
-                    outputPhaseNumber: +parts[4],
-                    nominalOutputVoltage: (+parts[5]) / 10,
-                    nominalInputVoltage: (+parts[6]) / 10,
-                    batteryPieceNumber: +parts[7],
-                    batteryVoltagePerUnit: (+parts[8]) / 10,
+                    machineNumber: parts[0],
+                    ratedVa: parts[1],
+                    outputPowerFactor: parts[2] / 100,
+                    inputPhaseNumber: parts[3],
+                    outputPhaseNumber: parts[4],
+                    nominalOutputVoltage: parts[5] / 10,
+                    nominalInputVoltage: parts[6] / 10,
+                    batteryPieceNumber: parts[7],
+                    batteryVoltagePerUnit: parts[8] / 10,
                 };
             }),
         );
@@ -74,23 +74,23 @@ export class Mpp {
     queryRatedInformation(timeout?: number) {
         return this.comm.query('PIRI', timeout ?? this.timeout).pipe(
             map(v => {
-                const parts = v.split(',');
+                const parts = v.split(',').map(p => +p);
                 return {
                     ratedInput: {
-                        voltage: (+parts[0]) / 10,
-                        freq: (+parts[1]) / 10,
-                        current: (+parts[2]) / 10,
+                        voltage: parts[0] / 10,
+                        freq: parts[1] / 10,
+                        current: parts[2] / 10,
                     },
                     ratedOutput: {
-                        voltage: (+parts[3]) / 10,
-                        current: (+parts[4]) / 10,
+                        voltage: parts[3] / 10,
+                        current: parts[4] / 10,
                     },
-                    mpptRatedCurrentPerString: (+parts[5]) / 10,
-                    batteryRatedVoltage: (+parts[6]) / 10,
-                    mpptTrackNumber: +parts[7],
-                    machineType: +parts[8],
-                    topology: +parts[9],
-                    parralelForOutputEnabled: parts[10] === '1',
+                    mpptRatedCurrentPerString: parts[5] / 10,
+                    batteryRatedVoltage: parts[6] / 10,
+                    mpptTrackNumber: parts[7],
+                    machineType: parts[8],
+                    topology: parts[9],
+                    parralelForOutputEnabled: parts[10] === 1,
                 };
             }),
         );
@@ -99,30 +99,34 @@ export class Mpp {
     queryGeneralStatus(timeout?: number) {
         return this.comm.query('GS', timeout ?? this.timeout).pipe(
             map(v => {
-                const parts = v.split(',');
+                const parts = v.split(',').map(p => +p);
                 return {
                     solarInput: {
-                        voltage1: (+parts[0]) / 10,
-                        voltage2: (+parts[1]) / 10,
-                        current1: (+parts[2]) / 10,
-                        current2: (+parts[3]) / 10,
+                        voltage1: parts[0] / 10,
+                        voltage2: parts[1] / 10,
+                        current1: parts[2] / 10,
+                        current2: parts[3] / 10,
                     },
                     battery: {
-                        voltage: (+parts[4]) / 10,
-                        capacity: +parts[5],
-                        current: (+parts[6]) / 10,
+                        voltage: parts[4] / 10,
+                        capacity: parts[5],
+                        current: parts[6] / 10,
                     },
                     acInput: {
-                        voltageR: (+parts[7]) / 10,
-                        voltageS: (+parts[8]) / 10,
-                        voltageT: (+parts[9]) / 10,
-                        frequency: (+parts[10]) / 100,
+                        voltage: {
+                            R: parts[7] / 10,
+                            S: parts[8] / 10,
+                            T: parts[9] / 10,
+                        },
+                        frequency: parts[10] / 100,
                     },
                     acOutput: {
-                        voltageR: (+parts[14]) / 10,
-                        voltageS: (+parts[15]) / 10,
-                        voltageT: (+parts[16]) / 10,
-                        frequency: (+parts[17]) / 100,
+                        voltage: {
+                            R: parts[14] / 10,
+                            S: parts[15] / 10,
+                            T: parts[16] / 10,
+                        },
+                        frequency: parts[17] / 100,
                     },
                 };
             }),
@@ -132,46 +136,46 @@ export class Mpp {
     queryPowerStatus(timeout?: number) {
         return this.comm.query('PS', timeout ?? this.timeout).pipe(
             map(v => {
-                const parts = v.split(',');
+                const parts = v.split(',').map(p => +p);
                 return {
                     solarInput: {
-                        power1: +parts[0],
-                        power2: +parts[1],
+                        power1: parts[0],
+                        power2: parts[1],
                     },
                     acInput: {
                         activePower: {
-                            R: +parts[3],
-                            S: +parts[4],
-                            T: +parts[5],
-                            total: +parts[6],
+                            R: parts[3],
+                            S: parts[4],
+                            T: parts[5],
+                            total: parts[6],
                         },
 
                     },
                     acOutput: {
                         activePower: {
-                            R: +parts[7],
-                            S: +parts[8],
-                            T: +parts[9],
-                            total: +parts[10],
+                            R: parts[7],
+                            S: parts[8],
+                            T: parts[9],
+                            total: parts[10],
                         },
                         apparentPower: {
-                            R: +parts[11],
-                            S: +parts[12],
-                            T: +parts[13],
-                            total: +parts[14],
+                            R: parts[11],
+                            S: parts[12],
+                            T: parts[13],
+                            total: parts[14],
                         },
-                        percentage: +parts[15],
+                        percentage: parts[15],
                     },
                     status: {
-                        acOutputConnected: +parts[16] === 1,
-                        solarInput1Working: +parts[17] === 1,
-                        solarInput2Working: +parts[18] === 1,
-                        batteryPowerDirection: +parts[19],
-                        batteryPowerDirectionStatus: BatteryPowerDirectionMapping.get(+parts[19]),
-                        dcAcPowerDirection: +parts[20],
-                        dcAcPowerDirectionStatus: DcAcPowerDirectionMapping.get(+parts[20]),
-                        linePowerDirection: +parts[21],
-                        linePowerDirectionStatus: LinePowerDirectionMapping.get(+parts[21]),
+                        acOutputConnected: parts[16] === 1,
+                        solarInput1Working: parts[17] === 1,
+                        solarInput2Working: parts[18] === 1,
+                        batteryPowerDirection: parts[19],
+                        batteryPowerDirectionStatus: BatteryPowerDirectionMapping.get(parts[19]),
+                        dcAcPowerDirection: parts[20],
+                        dcAcPowerDirectionStatus: DcAcPowerDirectionMapping.get(parts[20]),
+                        linePowerDirection: parts[21],
+                        linePowerDirectionStatus: LinePowerDirectionMapping.get(parts[21]),
                     },
                 };
             }),

@@ -1,6 +1,7 @@
 import { connectable, merge, Observable, Subject, Connectable, EMPTY, race } from 'rxjs';
 import { SerialCommunication } from './serial';
 import { concatMap, first, ignoreElements, scan, share, timeout } from 'rxjs/operators';
+import { logger } from '../log';
 
 const PCKG_START = 0x5e;
 const PCKG_END = 0x0d;
@@ -8,6 +9,7 @@ const PCKG_END = 0x0d;
 export class PackageCommunication {
     private readonly packages$: Observable<string>;
     private readonly work$ = new Subject<Work>();
+    private static CRC_ESCAPE = [0x28, 0x0D, 0x0A];
 
     private readonly doWork$ = this.work$.pipe(
         concatMap(v => {
@@ -57,6 +59,8 @@ export class PackageCommunication {
                         if (actualCrc === expectedCrc) {
                             const payload = message.subarray(5, messageLength + 5);
                             state.items.push(payload.toString('ascii'));
+                        } else {
+                            logger?.warn(`invalid crc. actual ${actualCrc}, expected ${expectedCrc}. Data: ${message.toString('hex')}`);
                         }
                     }
                 }
@@ -100,7 +104,19 @@ export class PackageCommunication {
                     crc = (crc ^ poly) & 0xFFFF;
             }
         }
-        return crc;
+
+        let crcHigh = crc >> 8;
+        let crcLow = crc & 0xFF;
+
+        if (PackageCommunication.CRC_ESCAPE.includes(crcHigh)) {
+            crcHigh++;
+        }
+
+        if (PackageCommunication.CRC_ESCAPE.includes(crcLow)) {
+            crcLow++;
+        }
+
+        return (crcHigh << 8) | crcLow;
     }
 
     private sendPacket(cmd: string) {
