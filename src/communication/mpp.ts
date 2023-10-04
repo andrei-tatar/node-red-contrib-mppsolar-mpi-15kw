@@ -104,8 +104,8 @@ export class Mpp {
                     solarInput: {
                         voltage1: parts[0] / 10,
                         voltage2: parts[1] / 10,
-                        current1: parts[2] / 10,
-                        current2: parts[3] / 10,
+                        current1: parts[2] / 100,
+                        current2: parts[3] / 100,
                     },
                     battery: {
                         voltage: parts[4] / 10,
